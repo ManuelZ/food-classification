@@ -24,4 +24,8 @@ search_space:
       - convnext_small
       - efficientnet_b0
       - mobilenet_v3_large
+      - mobilenet_v3_small
       - shufflenet_v2_x1_0
+      - regnet_y_400mf
+      - regnet_y_800mf
+      - mnasnet1_3
