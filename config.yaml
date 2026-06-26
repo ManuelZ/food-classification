@@ -45,7 +45,7 @@ model:
       T_max: 100
 
 data:
-  root_folder: F:\DATASETS\opencv-pytorch-classification-project-2
+  root_folder: /workspace/opencv-pytorch-classification-project-2
   batch_size: 32
   num_workers: 0
   target_size: 256
