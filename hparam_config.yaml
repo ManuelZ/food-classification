@@ -1,5 +1,5 @@
-n_trials: 20
-max_epochs: 5
+n_trials: 30
+max_epochs: 10
 pruner:
   n_startup_trials: 3
   n_warmup_steps: 5
