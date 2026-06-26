@@ -9,3 +9,5 @@ pandas
 scikit-learn
 tensorboard
 matplotlib
+optuna
+optuna-integration[pytorch_lightning]

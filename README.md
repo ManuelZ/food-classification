@@ -100,6 +100,39 @@ python main.py fit --config config.yaml --model.optimizer.init_args.lr 0.001 --t
 
 Run `python main.py fit --print_config` to see all available options.
 
+## Hyperparameter Search
+
+Automated search over learning rate, weight decay, batch size, and backbone architecture using [Optuna](https://optuna.org/) with early pruning of unpromising trials.
+
+```bash
+pip install optuna optuna-integration[pytorch_lightning]
+
+python hparam_search.py                          # defaults from config.yaml
+python hparam_search.py --n-trials 30 --max-epochs 10
+```
+
+The search space is defined in `config.yaml` under `hparam_search.search_space`. Each parameter needs a `type` (`float`, `int`, or `categorical`) and the corresponding bounds or choices:
+
+```yaml
+hparam_search:
+  n_trials: 20
+  max_epochs: 5
+  search_space:
+    lr:
+      type: float
+      low: 1.0e-6
+      high: 1.0e-2
+      log: true
+    batch_size:
+      type: categorical
+      choices: [64, 128, 256]
+    model_name:
+      type: categorical
+      choices: [resnet18, efficientnet_b0, convnext_tiny]
+```
+
+Each trial is logged to TensorBoard under `logs/optuna/trial_N/`. The study uses `MedianPruner` to stop unpromising trials after a warmup period, optimizing `valid/f1_macro`.
+
 ## Visualizing Training
 
 ```bash
