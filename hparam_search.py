@@ -113,6 +113,8 @@ def main():
         direction="maximize",
         pruner=pruner,
         study_name="food-classification-hpo",
+        storage="sqlite:///optuna.db",
+        load_if_exists=True,
     )
     study.optimize(
         lambda trial: objective(trial, args.max_epochs),
