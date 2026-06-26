@@ -108,7 +108,7 @@ def main():
     parser.add_argument("--max-epochs", type=int, default=_HPARAM["max_epochs"])
     args = parser.parse_args()
 
-    pruner = optuna.pruners.MedianPruner(n_startup_trials=3, n_warmup_steps=2)
+    pruner = optuna.pruners.MedianPruner(**_HPARAM["pruner"])
     study = optuna.create_study(
         direction="maximize",
         pruner=pruner,

@@ -1,5 +1,8 @@
 n_trials: 20
 max_epochs: 5
+pruner:
+  n_startup_trials: 3
+  n_warmup_steps: 5
 search_space:
   lr:
     type: float
