@@ -1,0 +1,8 @@
+torch
+torchvision
+lightning==2.6.1
+torchmetrics
+albumentations
+opencv-python
+pandas
+scikit-learn
