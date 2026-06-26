@@ -260,6 +260,12 @@ Host vastai
 
 The `LocalForward` line automatically tunnels TensorBoard (no separate SSH command needed). Update `HostName` and `Port` each time you start a new Vast.ai instance.
 
+Vast.ai drops you into an existing tmux session on login. To start a fresh one from within tmux:
+
+```
+Ctrl+b :new-session
+```
+
 Upload artifacts:
 ```bash
 aws s3 cp logs/ s3://$ARTIFACTS_BUCKET/food_classification/ --recursive
