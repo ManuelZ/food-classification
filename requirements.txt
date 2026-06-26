@@ -1,8 +1,10 @@
 torch
 torchvision
 lightning==2.6.1
+jsonargparse[signatures]>=4.27.7
 torchmetrics
 albumentations
 opencv-python
 pandas
 scikit-learn
+tensorboard
