@@ -68,7 +68,7 @@ class KenyaDataModule(pl.LightningDataModule):
                     translate_percent=0.1,
                     rotate=(-45, 45),
                     border_mode=cv2.BORDER_CONSTANT,
-                    value=0,
+                    fill=0,
                     p=0.5,
                 ),
                 A.CoarseDropout(
