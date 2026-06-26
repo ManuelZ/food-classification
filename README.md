@@ -85,8 +85,8 @@ Pre-resize images to a fixed square size before training to avoid repeated on-th
 
 ```bash
 python resize_images.py \
-  --images_dir /path/to/images/images \
-  --output_dir /path/to/resized/images/images \
+  --images_dir /workspace/opencv-pytorch-classification-project-2/images/images \
+  --output_dir /workspace/opencv-pytorch-classification-project-2-resize/images/images \
   --size 256
 ```
 
@@ -208,13 +208,18 @@ Pre-resize images (optional, avoids repeated on-the-fly resizing during training
 ```bash
 python resize_images.py \
   --images_dir /workspace/opencv-pytorch-classification-project-2/images/images \
-  --output_dir /workspace/opencv-pytorch-classification-project-2/images/images \
+  --output_dir /workspace/opencv-pytorch-classification-project-2-resize/images/images \
   --size 256
 ```
 
-Run:
+Copy CSV files to the new folder with the resized images:
 ```bash
-python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16
+cp /workspace/opencv-pytorch-classification-project-2/*.csv /workspace/opencv-pytorch-classification-project-2-resize/
+```
+
+Start training:
+```bash
+python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16 --model.model_name=convnext_tiny
 ```
 
 Monitor training with TensorBoard (run on the remote instance):
