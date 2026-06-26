@@ -6,7 +6,11 @@ import torch.nn.functional as F
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torchmetrics import MeanMetric
-from torchmetrics.classification import MulticlassAccuracy, MulticlassConfusionMatrix
+from torchmetrics.classification import (
+    MulticlassAccuracy,
+    MulticlassConfusionMatrix,
+    MulticlassF1Score,
+)
 from torchvision import models
 
 
@@ -49,6 +53,12 @@ class FineTuningWithResNet(pl.LightningModule):
         )
 
         self.confusion_matrix = MulticlassConfusionMatrix(num_classes=num_classes)
+        self.train_f1_macro = MulticlassF1Score(
+            num_classes=num_classes, average="macro"
+        )
+        self.valid_f1_macro = MulticlassF1Score(
+            num_classes=num_classes, average="macro"
+        )
 
     def forward(self, x):
         """ """
@@ -72,6 +82,7 @@ class FineTuningWithResNet(pl.LightningModule):
 
         self.mean_train_loss.update(loss, weight=data.shape[0])
         self.mean_train_acc.update(pred_batch, target)
+        self.train_f1_macro.update(pred_batch, target)
 
         # self.log("train/batch_loss", self.mean_train_loss, prog_bar=True, logger=True)
         # self.log("train/batch_acc", self.mean_train_acc, prog_bar=True, logger=True)
@@ -81,8 +92,17 @@ class FineTuningWithResNet(pl.LightningModule):
     def on_train_epoch_end(self):
         """Calculate epoch level metrics for the train set"""
 
-        self.log("train/loss", self.mean_train_loss, prog_bar=True, logger=True)
+        train_loss = self.mean_train_loss.compute()
+        train_f1 = self.train_f1_macro.compute()
+        self.logger.experiment.add_scalars(
+            "loss", {"train": train_loss}, self.current_epoch
+        )
+        self.logger.experiment.add_scalars(
+            "f1_macro", {"train": train_f1}, self.current_epoch
+        )
+        self.log("train/loss", self.mean_train_loss, prog_bar=False, logger=False)
         self.log("train/acc", self.mean_train_acc, prog_bar=True, logger=True)
+        self.log("train/f1_macro", self.train_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
 
     def validation_step(self, batch, *args, **kwargs):
@@ -100,6 +120,7 @@ class FineTuningWithResNet(pl.LightningModule):
 
         self.mean_valid_loss.update(loss, weight=data.shape[0])
         self.mean_valid_acc.update(pred_batch, target)
+        self.valid_f1_macro.update(pred_batch, target)
         self.confusion_matrix.update(pred_batch, target)
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
@@ -111,9 +132,24 @@ class FineTuningWithResNet(pl.LightningModule):
     def on_validation_epoch_end(self):
         """Calculate epoch level metrics for the validation set"""
 
-        self.log("valid/loss", self.mean_valid_loss, prog_bar=True, logger=True)
+        val_loss = self.mean_valid_loss.compute()
+        val_f1 = self.valid_f1_macro.compute()
+        self.logger.experiment.add_scalars(
+            "loss", {"val": val_loss}, self.current_epoch
+        )
+        self.logger.experiment.add_scalars(
+            "f1_macro", {"val": val_f1}, self.current_epoch
+        )
+        self.log("valid/loss", self.mean_valid_loss, prog_bar=False, logger=False)
         self.log("valid/acc", self.mean_valid_acc, prog_bar=True, logger=True)
+        self.log("valid/f1_macro", self.valid_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
+
+        fig, _ = self.confusion_matrix.plot()
+        self.logger.experiment.add_figure(
+            "valid/confusion_matrix", fig, self.current_epoch
+        )
+        self.confusion_matrix.reset()
 
     def configure_optimizers(self) -> OptimizerLRScheduler:
         """
