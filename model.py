@@ -38,6 +38,7 @@ class ImageClassifier(pl.LightningModule):
         model_name: str = "resnet18",
         weights: str = "DEFAULT",
         num_classes=10,
+        label_names: list[str] | None = None,
         optimizer: OptimizerCallable = torch.optim.Adam,
         scheduler: LRSchedulerCallable = torch.optim.lr_scheduler.ConstantLR,
     ):
@@ -150,7 +151,7 @@ class ImageClassifier(pl.LightningModule):
         self.log("valid/f1_macro", self.valid_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
 
-        fig, _ = self.confusion_matrix.plot()
+        fig, _ = self.confusion_matrix.plot(labels=self.label_names)
         self.logger.experiment.add_figure(
             "valid/confusion_matrix", fig, self.current_epoch
         )
