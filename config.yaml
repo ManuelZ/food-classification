@@ -1,0 +1,54 @@
+# See other possible options with:
+# python main.py fit --print_config
+
+seed_everything: 21
+
+trainer:
+  max_epochs: 1
+  precision: 16-mixed
+  fast_dev_run: false
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs
+      name: resnet50
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: valid/loss
+        min_delta: 0.001
+        patience: 10
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        monitor: valid/acc
+        mode: max
+        filename: fine-tuning-resnet50-epoch-{epoch:02d}
+        auto_insert_metric_name: false
+        save_weights_only: true
+
+model:
+  resnet_model_name: resnet50
+  weights: DEFAULT
+  num_classes: 13
+  optimizer:
+    class_path: torch.optim.Adam
+    init_args:
+      lr: 0.001
+      betas:
+      - 0.9
+      - 0.999
+      eps: 1.0e-08
+      weight_decay: 0.0
+  scheduler:
+    class_path: torch.optim.lr_scheduler.CosineAnnealingLR
+    init_args:
+      T_max: 100
+
+data:
+  root_folder: F:\DATASETS\opencv-pytorch-classification-project-2
+  batch_size: 32
+  num_workers: 0
+  target_size: 256
+  train_split: 0.75
+ckpt_path: null
+weights_only: null
