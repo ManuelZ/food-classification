@@ -117,6 +117,7 @@ def main():
     study.optimize(
         lambda trial: objective(trial, args.max_epochs),
         n_trials=args.n_trials,
+        gc_after_trial=True,
     )
 
     print(f"\nBest trial: #{study.best_trial.number}")
