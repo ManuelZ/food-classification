@@ -13,21 +13,24 @@ from torchmetrics.classification import (
 from torchvision import models
 
 
-def _build_backbone(model_name: str, weights: str) -> tuple[nn.Module, int]:
-    """Extract backbone and feature dim from a torchvision classification model."""
+def _replace_head(model_name: str, weights: str, num_classes: int) -> nn.Module:
+    """Replace the final Linear with a fresh head for num_classes."""
     model = getattr(models, model_name)(weights=weights)
 
     if hasattr(model, "fc") and isinstance(model.fc, nn.Linear):
-        # ResNet, RegNet, etc. — fc is the final Linear; avgpool+flatten stay in backbone
-        in_features = model.fc.in_features
-        return nn.Sequential(*list(model.children())[:-1]), in_features
+        # ResNet, ShuffleNet, RegNet, etc.
+        model.fc = nn.Linear(model.fc.in_features, num_classes)
+        return model
 
     if hasattr(model, "classifier") and isinstance(model.classifier, nn.Sequential):
-        # ConvNeXT, EfficientNet, etc. — find the last Linear in the Sequential head
-        for layer in reversed(list(model.classifier.children())):
+        # ConvNeXT, EfficientNet, MobileNet, etc. — replace only the last Linear
+        classifier_layers = list(model.classifier.children())
+        for i in reversed(range(len(classifier_layers))):
+            layer = classifier_layers[i]
             if isinstance(layer, nn.Linear):
-                model.classifier = nn.Identity()
-                return model, layer.in_features
+                classifier_layers[i] = nn.Linear(layer.in_features, num_classes)
+                model.classifier = nn.Sequential(*classifier_layers)
+                return model
 
     raise ValueError(f"Unsupported architecture: {model_name}")
 
@@ -52,10 +55,7 @@ class ImageClassifier(pl.LightningModule):
         self.scheduler = scheduler
         self.label_names = label_names
 
-        self.backbone, in_features = _build_backbone(model_name, weights)
-
-        # Add a classifier head
-        self.classifier = nn.Linear(in_features=in_features, out_features=num_classes)
+        self.backbone = _replace_head(model_name, weights, num_classes)
 
         # Initializing the required metric objects.
         self.mean_train_loss = MeanMetric()
@@ -71,10 +71,7 @@ class ImageClassifier(pl.LightningModule):
         )
 
     def forward(self, x):
-        """ """
-        x = self.backbone(x).flatten(1)
-        x = self.classifier(x)
-        return x
+        return self.backbone(x)
 
     def training_step(self, batch, *args, **kwargs):
         """ """
