@@ -108,4 +108,70 @@ tensorboard --logdir logs/
 
 ---
 
+## Cloud Training: Dataset Download, Training, and Artifact Upload
+
+**Prerequisites:** create two S3 buckets (one for datasets, one for artifacts), create an IAM user with appropriate S3 permissions, and generate access keys.
+
+In the platform instance settings, add these variables to the secrets/environment panel before launching:
+
+```bash
+AWS_ACCESS_KEY_ID=<YOUR_ACCESS_KEY_ID>
+AWS_SECRET_ACCESS_KEY=<YOUR_SECRET_ACCESS_KEY>
+AWS_DEFAULT_REGION=<YOUR_REGION>
+ARTIFACTS_BUCKET=<BUCKET_NAME>
+DATASETS_BUCKET=<ANOTHER_BUCKET_NAME>
+```
+
+Both the AWS CLI and boto3 recognize these variable names natively. `DATASETS_BUCKET` is used to download the dataset; `ARTIFACTS_BUCKET` is used to upload trained checkpoints and logs after training.
+
+Install AWS CLI:
+```bash
+pip install awscli
+```
+
+Download dataset:
+```bash
+aws s3 cp s3://$DATASETS_BUCKET/opencv-pytorch-classification-project-2.zip opencv-pytorch-classification-project-2.zip
+```
+
+Unzip downloaded dataset:
+```bash
+unzip opencv-pytorch-classification-project-2.zip -d /workspace/opencv-pytorch-classification-project-2
+```
+
+Download repo:
+```bash
+git clone https://github.com/ManuelZ/food-classification.git
+```
+
+Install dependencies:
+```bash
+cd food-classification
+pip install -r requirements.txt
+```
+
+Run:
+```bash
+python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16 --model.optimizer.lr=0.1
+```
+
+Monitor training with TensorBoard (run on the remote instance):
+```bash
+tensorboard --logdir food_classification/logs/ --bind_all
+```
+
+Forward the TensorBoard port to your local machine (run locally):
+```bash
+ssh -p <remote_port> root@<remote_host> -L 16006:localhost:6006 -i ~/.ssh/id_ed25519_platform
+```
+
+Then open http://localhost:16006 in your local browser.
+
+Upload artifacts:
+```bash
+aws s3 cp logs/ s3://$ARTIFACTS_BUCKET/food_classification/ --recursive
+```
+
+---
+
 **Note:** This project was originally developed as the second assignment of the OpenCV University course ["Deep Learning with PyTorch"](https://opencv.org/university/deep-learning-with-pytorch/).
