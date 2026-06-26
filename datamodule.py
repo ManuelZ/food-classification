@@ -65,9 +65,9 @@ class KenyaDataModule(pl.LightningDataModule):
                 A.GaussNoise(p=0.2),
                 A.Sharpen(alpha=(0.2, 0.5), lightness=(0.5, 1.0), p=0.3),
                 A.Affine(
+                    translate_percent=0.1,
+                    rotate=(-45, 45),
                     border_mode=cv2.BORDER_CONSTANT,
-                    rotate_limit=15,
-                    scale_limit=0.1,
                     value=0,
                     p=0.5,
                 ),
