@@ -206,7 +206,7 @@ pip install -r requirements.txt
 
 Run:
 ```bash
-python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16 --model.optimizer.lr=0.1
+python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16
 ```
 
 Monitor training with TensorBoard (run on the remote instance):
