@@ -79,6 +79,27 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Data Preparation (optional)
+
+Pre-resize images to a fixed square size before training to avoid repeated on-the-fly resizing:
+
+```bash
+python resize_images.py \
+  --images_dir /path/to/images/images \
+  --output_dir /path/to/resized/images/images \
+  --size 256
+```
+
+| Argument | Default | Description |
+|---|---|---|
+| `--images_dir` | *(required)* | Source directory containing images |
+| `--output_dir` | same as `--images_dir` | Destination directory; omit to resize in-place |
+| `--size` | `256` | Target width and height in pixels |
+| `--quality` | `95` | JPEG output quality (1–100) |
+| `--workers` | CPU count | Parallel worker processes |
+
+### Training
+
 Set `data.root_folder` in `config.yaml` to your local dataset path, then run:
 
 ```bash
