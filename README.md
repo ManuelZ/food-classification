@@ -211,7 +211,7 @@ python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_worke
 
 Monitor training with TensorBoard (run on the remote instance):
 ```bash
-tensorboard --logdir food_classification/logs/ --bind_all
+tensorboard --logdir food_classification/logs/
 ```
 
 Forward the TensorBoard port to your local machine (run locally):
