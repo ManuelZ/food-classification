@@ -59,7 +59,7 @@ model:
       T_max: 100
 
 data:
-  root_folder: /workspace/opencv-pytorch-classification-project-2
+  root_folder: /workspace/opencv-pytorch-classification-project-2-resize
   batch_size: 32
   prefetch_factor: 4
   num_workers: 0
