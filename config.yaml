@@ -47,6 +47,7 @@ model:
 data:
   root_folder: /workspace/opencv-pytorch-classification-project-2
   batch_size: 32
+  prefetch_factor: 4
   num_workers: 0
   target_size: 256
   train_split: 0.75

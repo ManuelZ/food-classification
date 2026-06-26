@@ -36,6 +36,7 @@ class KenyaDataModule(pl.LightningDataModule):
         root_folder: str,
         batch_size: int = 32,
         num_workers: int = 1,
+        prefetch_factor: int = 2,
         target_size: int = 256,
         train_split: float = 0.75,
     ):
@@ -45,6 +46,7 @@ class KenyaDataModule(pl.LightningDataModule):
         self.root_folder = root_folder
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.prefetch_factor = prefetch_factor
         self.target_size = target_size
         self.train_split = train_split
 
@@ -169,6 +171,9 @@ class KenyaDataModule(pl.LightningDataModule):
             shuffle=True,
             drop_last=True,
             num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=True,
+            prefetch_factor=self.prefetch_factor,
         )
 
     def val_dataloader(self):
@@ -178,6 +183,9 @@ class KenyaDataModule(pl.LightningDataModule):
             shuffle=False,
             drop_last=False,
             num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=True,
+            prefetch_factor=self.prefetch_factor,
         )
 
     def predict_dataloader(self):
@@ -187,4 +195,7 @@ class KenyaDataModule(pl.LightningDataModule):
             shuffle=False,
             drop_last=False,
             num_workers=self.num_workers,
+            pin_memory=True,
+            persistent_workers=True,
+            prefetch_factor=self.prefetch_factor,
         )
