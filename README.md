@@ -7,7 +7,7 @@ Image classification of 13 traditional Kenyan food categories using transfer lea
 
 ## Dataset
 
-8,174 images split into **6,536 training** and **1,638 validation** images (75/25 stratified split) across 13 classes:
+**8,174 images** across **13 classes**, split into 6,536 training and 1,638 test images. The training set is further divided into train/val using a 75/25 stratified split.
 
 > Bhaji, Chapati, Githeri, Kachumbari, Kukuchoma, Mandazi, Masalachips, Matoke, Mukimo, Nyamachoma, Pilau, Sukumawiki, Ugali
 
