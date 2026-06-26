@@ -20,7 +20,7 @@ trainer:
         patience: 10
     - class_path: lightning.pytorch.callbacks.ModelCheckpoint
       init_args:
-        monitor: valid/acc
+        monitor: valid/f1_macro
         mode: max
         filename: fine-tuning-resnet50-epoch-{epoch:02d}
         auto_insert_metric_name: false

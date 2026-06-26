@@ -7,7 +7,6 @@ from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import OptimizerLRScheduler
 from torchmetrics import MeanMetric
 from torchmetrics.classification import (
-    MulticlassAccuracy,
     MulticlassConfusionMatrix,
     MulticlassF1Score,
 )
@@ -44,13 +43,7 @@ class ImageClassifier(pl.LightningModule):
 
         # Initializing the required metric objects.
         self.mean_train_loss = MeanMetric()
-        self.mean_train_acc = MulticlassAccuracy(
-            num_classes=num_classes, average="micro"
-        )
         self.mean_valid_loss = MeanMetric()
-        self.mean_valid_acc = MulticlassAccuracy(
-            num_classes=num_classes, average="micro"
-        )
 
         self.confusion_matrix = MulticlassConfusionMatrix(num_classes=num_classes)
         self.test_predictions = []
@@ -82,11 +75,7 @@ class ImageClassifier(pl.LightningModule):
         pred_batch = output.detach().argmax(dim=1)
 
         self.mean_train_loss.update(loss, weight=data.shape[0])
-        self.mean_train_acc.update(pred_batch, target)
         self.train_f1_macro.update(pred_batch, target)
-
-        # self.log("train/batch_loss", self.mean_train_loss, prog_bar=True, logger=True)
-        # self.log("train/batch_acc", self.mean_train_acc, prog_bar=True, logger=True)
 
         return loss
 
@@ -102,7 +91,6 @@ class ImageClassifier(pl.LightningModule):
             "f1_macro", {"train": train_f1}, self.current_epoch
         )
         self.log("train/loss", self.mean_train_loss, prog_bar=False, logger=False)
-        self.log("train/acc", self.mean_train_acc, prog_bar=True, logger=True)
         self.log("train/f1_macro", self.train_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
 
@@ -120,7 +108,6 @@ class ImageClassifier(pl.LightningModule):
         pred_batch = output.argmax(dim=1)
 
         self.mean_valid_loss.update(loss, weight=data.shape[0])
-        self.mean_valid_acc.update(pred_batch, target)
         self.valid_f1_macro.update(pred_batch, target)
         self.confusion_matrix.update(pred_batch, target)
 
@@ -145,7 +132,6 @@ class ImageClassifier(pl.LightningModule):
             "f1_macro", {"val": val_f1}, self.current_epoch
         )
         self.log("valid/loss", self.mean_valid_loss, prog_bar=False, logger=False)
-        self.log("valid/acc", self.mean_valid_acc, prog_bar=True, logger=True)
         self.log("valid/f1_macro", self.valid_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
 

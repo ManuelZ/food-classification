@@ -42,7 +42,7 @@ Fine-tuning a pretrained **ResNet-50** backbone with a linear classification hea
 - Scheduler: CosineAnnealingLR (configurable via `config.yaml`)
 - Mixed precision: `16-mixed`
 - Early stopping on `valid/loss` (patience: 10)
-- Best checkpoint saved by `valid/acc`
+- Best checkpoint saved by `valid/f1_macro`
 - Logs: TensorBoard
 
 ## Results
