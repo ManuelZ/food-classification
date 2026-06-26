@@ -22,9 +22,11 @@ from model import ImageClassifier
 with open("config.yaml") as f:
     _config = yaml.safe_load(f)
 
+with open("hparam_config.yaml") as f:
+    _HPARAM = yaml.safe_load(f)
+
 _DATA = _config["data"]
 _MODEL = _config["model"]
-_HPARAM = _config["hparam_search"]
 
 
 def _suggest(trial: optuna.Trial, search_space: dict) -> dict:
@@ -57,7 +59,7 @@ def objective(trial: optuna.Trial, max_epochs: int) -> float:
         root_folder=_DATA["root_folder"],
         batch_size=batch_size,
         num_workers=_DATA["num_workers"],
-        prefetch_factor=_DATA["prefetch_factor"],
+        prefetch_factor=_DATA.get("prefetch_factor"),
         target_size=_DATA["target_size"],
         train_split=_DATA["train_split"],
     )
