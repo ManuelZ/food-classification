@@ -11,3 +11,4 @@ tensorboard
 matplotlib
 optuna
 optuna-integration[pytorch_lightning]
+optuna-dashboard
