@@ -221,6 +221,26 @@ ssh -p <remote_port> root@<remote_host> -L 16006:localhost:6006 -i ~/.ssh/id_ed2
 
 Then open http://localhost:16006 in your local browser.
 
+**Alternatively, connect with VS Code Remote SSH** (port forwarding included):
+
+1. Install the **Remote - SSH** extension in VS Code
+2. Press `Ctrl+Shift+P` → **Remote-SSH: Add New SSH Host...**
+3. Paste the SSH command from the Vast.ai instance panel (e.g. `ssh root@<IP> -p <PORT>`)
+4. VS Code will create an entry in `~/.ssh/config` — open that file and update the block to:
+
+```
+Host vastai
+    HostName <IP>
+    Port <PORT>
+    User root
+    LocalForward 16006 localhost:6006
+    IdentityFile ~/.ssh/<PRIVATE_KEY_FILENAME>
+```
+
+5. Press `Ctrl+Shift+P` → **Remote-SSH: Connect to Host...** → select `vastai`
+
+The `LocalForward` line automatically tunnels TensorBoard (no separate SSH command needed). Update `HostName` and `Port` each time you start a new Vast.ai instance.
+
 Upload artifacts:
 ```bash
 aws s3 cp logs/ s3://$ARTIFACTS_BUCKET/food_classification/ --recursive
