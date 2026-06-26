@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training logs and checkpoints (TensorBoard, Lightning)
+logs/
+*.ckpt
+*.pt
+*.pth
+
+# Dataset / data files
+data/
+datasets/
+*.zip
+*.tar.gz
+*.tar
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
