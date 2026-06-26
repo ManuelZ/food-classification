@@ -154,6 +154,12 @@ hparam_search:
 
 Each trial is logged to TensorBoard under `logs/optuna/trial_N/`. The study uses `MedianPruner` to stop unpromising trials after a warmup period, optimizing `valid/f1_macro`.
 
+Results are persisted to `optuna.db` in the project root. To monitor trials live with the Optuna Dashboard (run in a separate terminal while the search is running):
+
+```bash
+optuna-dashboard sqlite:///optuna.db
+```
+
 ## Visualizing Training
 
 ```bash
