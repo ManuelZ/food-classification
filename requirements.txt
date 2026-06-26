@@ -8,3 +8,4 @@ opencv-python
 pandas
 scikit-learn
 tensorboard
+matplotlib
