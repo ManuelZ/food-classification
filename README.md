@@ -204,6 +204,14 @@ cd food-classification
 pip install -r requirements.txt
 ```
 
+Pre-resize images (optional, avoids repeated on-the-fly resizing during training):
+```bash
+python resize_images.py \
+  --images_dir /workspace/opencv-pytorch-classification-project-2/images/images \
+  --output_dir /workspace/opencv-pytorch-classification-project-2/images/images \
+  --size 256
+```
+
 Run:
 ```bash
 python main.py fit --config config.yaml --trainer.max_epochs=10 --data.num_workers=16
