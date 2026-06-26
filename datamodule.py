@@ -50,48 +50,35 @@ class KenyaDataModule(pl.LightningDataModule):
         self.target_size = target_size
         self.train_split = train_split
 
-        self.common_transforms = A.Compose(
-            [
-                A.Resize(height=self.target_size, width=self.target_size, p=1),
-                A.CenterCrop(height=224, width=224, p=1),
-                A.Normalize(),
-                ToTensorV2(),
-            ]
-        )
+        self.common_transforms = A.Compose([A.Normalize(), ToTensorV2()])
 
         self.train_transforms = A.Compose(
             [
-                # A.RandomResizedCrop(data_config.TARGET_SIZE, data_config.TARGET_SIZE),
-                A.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.3),
-                A.ToGray(p=0.1),
                 A.HorizontalFlip(),
                 A.VerticalFlip(),
                 A.RandomRotate90(),
+                A.ColorJitter(
+                    brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2, p=0.8
+                ),
+                A.ToGray(p=0.1),
+                A.GaussianBlur(blur_limit=(3, 7), p=0.2),
+                A.GaussNoise(p=0.2),
+                A.Sharpen(alpha=(0.2, 0.5), lightness=(0.5, 1.0), p=0.3),
                 A.Affine(
                     border_mode=cv2.BORDER_CONSTANT,
-                    rotate_limit=10,
-                    scale_limit=0.0,
+                    rotate_limit=15,
+                    scale_limit=0.1,
                     value=0,
-                    p=0.75,
-                ),
-                A.ElasticTransform(
-                    alpha=120,
-                    sigma=6,
-                    alpha_affine=8,
-                    border_mode=cv2.BORDER_CONSTANT,
-                    value=0,
-                    interpolation=cv2.INTER_LINEAR,
                     p=0.5,
                 ),
-                A.GridDistortion(
-                    num_steps=5,
-                    distort_limit=0.05,
-                    border_mode=cv2.BORDER_CONSTANT,
-                    value=0,
-                    interpolation=cv2.INTER_LINEAR,
-                    p=0.5,
+                A.CoarseDropout(
+                    num_holes_range=(1, 8),
+                    hole_height_range=(16, 32),
+                    hole_width_range=(16, 32),
+                    p=0.3,
                 ),
-                self.common_transforms,
+                A.Normalize(),
+                ToTensorV2(),
             ]
         )
 
