@@ -13,6 +13,25 @@ from torchmetrics.classification import (
 from torchvision import models
 
 
+def _build_backbone(model_name: str, weights: str) -> tuple[nn.Module, int]:
+    """Extract backbone and feature dim from a torchvision classification model."""
+    model = getattr(models, model_name)(weights=weights)
+
+    if hasattr(model, "fc") and isinstance(model.fc, nn.Linear):
+        # ResNet, RegNet, etc. — fc is the final Linear; avgpool+flatten stay in backbone
+        in_features = model.fc.in_features
+        return nn.Sequential(*list(model.children())[:-1]), in_features
+
+    if hasattr(model, "classifier") and isinstance(model.classifier, nn.Sequential):
+        # ConvNeXT, EfficientNet, etc. — find the last Linear in the Sequential head
+        for layer in reversed(list(model.classifier.children())):
+            if isinstance(layer, nn.Linear):
+                model.classifier = nn.Identity()
+                return model, layer.in_features
+
+    raise ValueError(f"Unsupported architecture: {model_name}")
+
+
 class ImageClassifier(pl.LightningModule):
     def __init__(
         self,
@@ -30,16 +49,12 @@ class ImageClassifier(pl.LightningModule):
 
         self.optimizer = optimizer
         self.scheduler = scheduler
+        self.label_names = label_names
 
-        # Init the backbone of a pretrained Resnet
-        resnet = getattr(models, model_name)(weights=weights)
-        layers = list(resnet.children())[:-1]
-        self.backbone = nn.Sequential(*layers)
+        self.backbone, in_features = _build_backbone(model_name, weights)
 
         # Add a classifier head
-        self.classifier = nn.Linear(
-            in_features=resnet.fc.in_features, out_features=num_classes
-        )
+        self.classifier = nn.Linear(in_features=in_features, out_features=num_classes)
 
         # Initializing the required metric objects.
         self.mean_train_loss = MeanMetric()
