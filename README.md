@@ -85,11 +85,11 @@ Set `data.root_folder` in `config.yaml` to your local dataset path, then run:
 # Train
 python main.py fit --config config.yaml
 
-# Validate a checkpoint
+# Validate a checkpoint on the validation set
 python main.py validate --config config.yaml --ckpt_path path/to/checkpoint.ckpt
 
-# Generate predictions on the test set
-python main.py predict --config config.yaml --ckpt_path path/to/checkpoint.ckpt
+# Evaluate on the test set
+python main.py test --config config.yaml --ckpt_path path/to/checkpoint.ckpt
 ```
 
 Any `config.yaml` value can be overridden from the command line:

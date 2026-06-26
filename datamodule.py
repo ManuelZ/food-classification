@@ -144,7 +144,7 @@ class KenyaDataModule(pl.LightningDataModule):
             transforms=self.valid_transforms,
         )
 
-        self.predict_dataset = KenyanFood13Dataset(
+        self.test_dataset = KenyanFood13Dataset(
             self.root_folder,
             "images/images",
             test_ids.tolist(),
@@ -175,9 +175,9 @@ class KenyaDataModule(pl.LightningDataModule):
             prefetch_factor=self.prefetch_factor,
         )
 
-    def predict_dataloader(self):
+    def test_dataloader(self):
         return DataLoader(
-            self.predict_dataset,
+            self.test_dataset,
             batch_size=self.batch_size,
             shuffle=False,
             drop_last=False,

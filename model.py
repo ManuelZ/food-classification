@@ -53,6 +53,7 @@ class FineTuningWithResNet(pl.LightningModule):
         )
 
         self.confusion_matrix = MulticlassConfusionMatrix(num_classes=num_classes)
+        self.test_predictions = []
         self.train_f1_macro = MulticlassF1Score(
             num_classes=num_classes, average="macro"
         )
@@ -123,11 +124,14 @@ class FineTuningWithResNet(pl.LightningModule):
         self.valid_f1_macro.update(pred_batch, target)
         self.confusion_matrix.update(pred_batch, target)
 
-    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+    def test_step(self, batch, batch_idx):
         data, imageid = batch
         output = self(data)
         pred = output.detach().argmax(dim=1)
-        return imageid, pred
+        self.test_predictions.append((imageid, pred))
+
+    def on_test_epoch_end(self):
+        self.test_predictions.clear()
 
     def on_validation_epoch_end(self):
         """Calculate epoch level metrics for the validation set"""
