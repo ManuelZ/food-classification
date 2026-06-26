@@ -2,7 +2,6 @@
 
 Image classification of 13 traditional Kenyan food categories using transfer learning with ResNet-50, built with PyTorch Lightning.
 
-**Result: 75.2% validation accuracy after ~200 epochs.**
 
 ---
 
@@ -11,6 +10,11 @@ Image classification of 13 traditional Kenyan food categories using transfer lea
 8,174 images split into **6,536 training** and **1,638 validation** images (75/25 stratified split) across 13 classes:
 
 > Bhaji, Chapati, Githeri, Kachumbari, Kukuchoma, Mandazi, Masalachips, Matoke, Mukimo, Nyamachoma, Pilau, Sukumawiki, Ugali
+
+<p align="center">
+  <img src="media/data-sample.png" alt="Sample images from the Kenyan food" height="400"/>
+</p>
+<p align="center"><em>Sample images from the Kenyan food</em></p>
 
 The dataset expects the following structure under `root_folder` (configured in `config.yaml`):
 
@@ -40,6 +44,22 @@ Fine-tuning a pretrained **ResNet-50** backbone with a linear classification hea
 - Early stopping on `valid/loss` (patience: 10)
 - Best checkpoint saved by `valid/acc`
 - Logs: TensorBoard
+
+## Results
+
+| Metric | Value |
+|--------|-------|
+| Validation Accuracy | **75.2%** |
+| Training Epochs | ~200 |
+| Dataset Size | 8,174 images |
+| Classes | 13 |
+| Backbone | ResNet-50 (ImageNet pretrained) |
+
+<p align="center">
+  <img src="media/training_curves.png" alt="Training and validation loss/accuracy curves" width="850"/>
+</p>
+
+Training was monitored with TensorBoard. Early stopping (patience=10) on `valid/loss` prevented overfitting; the best checkpoint was selected by peak `valid/acc`.
 
 ## Project Structure
 
