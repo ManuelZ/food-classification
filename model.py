@@ -14,10 +14,10 @@ from torchmetrics.classification import (
 from torchvision import models
 
 
-class FineTuningWithResNet(pl.LightningModule):
+class ImageClassifier(pl.LightningModule):
     def __init__(
         self,
-        resnet_model_name: str = "resnet18",
+        model_name: str = "resnet18",
         weights: str = "DEFAULT",
         num_classes=10,
         optimizer: OptimizerCallable = torch.optim.Adam,
@@ -33,7 +33,7 @@ class FineTuningWithResNet(pl.LightningModule):
         self.scheduler = scheduler
 
         # Init the backbone of a pretrained Resnet
-        resnet = getattr(models, resnet_model_name)(weights=weights)
+        resnet = getattr(models, model_name)(weights=weights)
         layers = list(resnet.children())[:-1]
         self.backbone = nn.Sequential(*layers)
 

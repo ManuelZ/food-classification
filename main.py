@@ -8,11 +8,11 @@ from lightning.pytorch.cli import LightningCLI
 
 # Local imports
 from datamodule import KenyaDataModule
-from model import FineTuningWithResNet
+from model import ImageClassifier
 
 
 def cli_main():
-    LightningCLI(FineTuningWithResNet, KenyaDataModule, auto_configure_optimizers=False)
+    LightningCLI(ImageClassifier, KenyaDataModule, auto_configure_optimizers=False)
 
 
 if __name__ == "__main__":

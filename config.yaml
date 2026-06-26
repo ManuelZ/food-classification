@@ -27,7 +27,7 @@ trainer:
         save_weights_only: true
 
 model:
-  resnet_model_name: resnet50
+  model_name: resnet50
   weights: DEFAULT
   num_classes: 13
   optimizer:

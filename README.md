@@ -65,7 +65,7 @@ Training was monitored with TensorBoard. Early stopping (patience=10) on `valid/
 
 ```
 ├── main.py          # Entry point — wires LightningCLI
-├── model.py         # FineTuningWithResNet (LightningModule)
+├── model.py         # ImageClassifier (LightningModule)
 ├── datamodule.py    # KenyaDataModule (LightningDataModule)
 ├── dataset.py       # KenyanFood13Dataset (torch Dataset)
 └── config.yaml      # All hyperparameters
