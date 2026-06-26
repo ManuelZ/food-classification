@@ -3,10 +3,8 @@ import lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from lightning.pytorch.callbacks import BaseFinetuning
 from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 from lightning.pytorch.utilities.types import OptimizerLRScheduler
-from torch.nn.modules.batchnorm import _BatchNorm
 from torchmetrics import MeanMetric
 from torchmetrics.classification import MulticlassAccuracy, MulticlassConfusionMatrix
 from torchvision import models
@@ -124,32 +122,3 @@ class FineTuningWithResNet(pl.LightningModule):
         optimizer = self.optimizer(self.parameters())
         scheduler = self.scheduler(optimizer)
         return {"optimizer": optimizer, "lr_scheduler": scheduler}
-
-    def unfreeze_head(self):
-        """
-        This is not overriding anything, it's just a method I created.
-        """
-
-        for param in self.classifier.parameters():
-            param.requires_grad = True
-
-    def unfreeze_backbone_layers(self, layers: list[int]):
-        """
-        This is not overriding anything, it's just a method I created.
-        """
-
-        # self.backbone has 4 Sequential layers, from backbone[4] to backbone[7]
-        for l in layers:
-            backbone_layer = self.backbone[l]
-            modules = BaseFinetuning.flatten_modules(backbone_layer)
-
-            for module in modules:
-                if isinstance(module, _BatchNorm):
-                    module.track_running_stats = True
-                # recursion could yield duplicate parameters for parent modules w/ parameters so disabling it
-                for param in module.parameters(recurse=False):
-                    param.requires_grad = True
-
-    def freeze_backbone(self):
-        """ """
-        BaseFinetuning.freeze(self.backbone, train_bn=False)
