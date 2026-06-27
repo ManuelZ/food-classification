@@ -6,15 +6,19 @@
 # Standard Library imports
 import argparse
 import functools
+import os
+import tempfile
 from datetime import datetime
 
 # External imports
 import lightning as pl
+import matplotlib.pyplot as plt
 import optuna
 import torch
 import yaml
 from lightning.pytorch.callbacks import EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
+from optuna.artifacts import FileSystemArtifactStore, upload_artifact
 from optuna_integration import PyTorchLightningPruningCallback
 
 # Local imports
@@ -50,7 +54,12 @@ def _suggest(trial: optuna.Trial, search_space: dict) -> dict:
     return params
 
 
-def objective(trial: optuna.Trial, max_epochs: int, run_name: str) -> float:
+def objective(
+    trial: optuna.Trial,
+    max_epochs: int,
+    run_name: str,
+    artifact_store: FileSystemArtifactStore,
+) -> float:
     params = _suggest(trial, _HPARAM["search_space"])
     lr = params["lr"]
     weight_decay = params["weight_decay"]
@@ -103,6 +112,18 @@ def objective(trial: optuna.Trial, max_epochs: int, run_name: str) -> float:
 
     trainer.fit(model, datamodule)
 
+    if model.last_cm_fig is not None:
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            cm_path = os.path.join(tmp_dir, f"cm_trial_{trial.number}.png")
+            model.last_cm_fig.savefig(cm_path, bbox_inches="tight")
+            plt.close(model.last_cm_fig)
+            artifact_id = upload_artifact(
+                artifact_store=artifact_store,
+                file_path=cm_path,
+                study_or_trial=trial,
+            )
+            trial.set_user_attr("cm_artifact_id", artifact_id)
+
     return trainer.callback_metrics["valid/f1_macro"].item()
 
 
@@ -123,6 +144,8 @@ def main():
     storage = args.storage or f"sqlite:///optuna_{timestamp}.db"
     load_if_exists = args.storage is not None
 
+    artifact_store = FileSystemArtifactStore(base_path="artifacts")
+
     pruner = optuna.pruners.MedianPruner(**_HPARAM["pruner"])
     study = optuna.create_study(
         direction="maximize",
@@ -133,7 +156,10 @@ def main():
     )
     study.optimize(
         lambda trial: objective(
-            trial, args.max_epochs, f"{_HPARAM['logger_name']}_{timestamp}"
+            trial,
+            args.max_epochs,
+            f"{_HPARAM['logger_name']}_{timestamp}",
+            artifact_store,
         ),
         n_trials=args.n_trials,
         gc_after_trial=True,

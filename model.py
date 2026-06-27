@@ -62,6 +62,7 @@ class ImageClassifier(pl.LightningModule):
         self.mean_valid_loss = MeanMetric()
 
         self.confusion_matrix = MulticlassConfusionMatrix(num_classes=num_classes)
+        self.last_cm_fig = None
         self.test_predictions = []
         self.train_f1_macro = MulticlassF1Score(
             num_classes=num_classes, average="macro"
@@ -151,8 +152,9 @@ class ImageClassifier(pl.LightningModule):
         fig, ax = self.confusion_matrix.plot(labels=self.label_names)
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
         self.logger.experiment.add_figure(
-            "valid/confusion_matrix", fig, self.current_epoch
+            "valid/confusion_matrix", fig, self.current_epoch, close=False
         )
+        self.last_cm_fig = fig
         self.confusion_matrix.reset()
 
     def configure_optimizers(self) -> OptimizerLRScheduler:
