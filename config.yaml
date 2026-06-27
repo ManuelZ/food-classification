@@ -5,6 +5,20 @@ model:
   model_name: resnet50
   weights: DEFAULT
   num_classes: 13
+  label_names:
+    - bhaji
+    - chapati
+    - githeri
+    - kachumbari
+    - kukuchoma
+    - mandazi
+    - masalachips
+    - matoke
+    - mukimo
+    - nyamachoma
+    - pilau
+    - sukumawiki
+    - ugali
   optimizer:
     class_path: torch.optim.Adam
     init_args:
@@ -45,20 +59,6 @@ trainer:
 data:
   root_folder: /workspace/opencv-pytorch-classification-project-2-resize
   batch_size: 256
-  label_names:
-    - bhaji
-    - chapati
-    - githeri
-    - kachumbari
-    - kukuchoma
-    - mandazi
-    - masalachips
-    - matoke
-    - mukimo
-    - nyamachoma
-    - pilau
-    - sukumawiki
-    - ugali
   prefetch_factor: 4
   num_workers: 0
   target_size: 256

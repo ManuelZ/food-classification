@@ -84,7 +84,7 @@ def objective(
         model_name=model_name,
         weights="DEFAULT",
         num_classes=_MODEL["num_classes"],
-        label_names=_DATA["label_names"],
+        label_names=_MODEL["label_names"],
         optimizer=optimizer_callable,
         scheduler=scheduler_callable,
     )
