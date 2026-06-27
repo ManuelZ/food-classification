@@ -22,6 +22,9 @@ logs/
 *.pt
 *.pth
 
+# Optuna Sqlite
+*.db
+
 # Dataset / data files
 data/
 datasets/
