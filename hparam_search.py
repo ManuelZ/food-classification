@@ -55,7 +55,7 @@ def objective(trial: optuna.Trial, max_epochs: int) -> float:
     lr = params["lr"]
     weight_decay = params["weight_decay"]
     batch_size = params["batch_size"]
-    model_name = params["model_name"]
+    model_name = params.get("model_name", _MODEL["model_name"])
 
     datamodule = KenyaDataModule(
         root_folder=_DATA["root_folder"],
