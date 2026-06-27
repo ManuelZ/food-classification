@@ -47,7 +47,7 @@ model:
   optimizer:
     class_path: torch.optim.Adam
     init_args:
-      lr: 0.001
+      lr: 0.0005
       betas:
       - 0.9
       - 0.999
@@ -60,7 +60,7 @@ model:
 
 data:
   root_folder: /workspace/opencv-pytorch-classification-project-2-resize
-  batch_size: 32
+  batch_size: 256
   prefetch_factor: 4
   num_workers: 0
   target_size: 256
