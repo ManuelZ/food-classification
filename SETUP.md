@@ -99,7 +99,7 @@ python main.py fit --config config.yaml \
 
 ## Hyperparameter Search
 
-Automated search over learning rate, weight decay, batch size, and backbone architecture using [Optuna](https://optuna.org/) with early pruning of unpromising trials.
+Automated search over learning rate, weight decay, batch size, and backbone architecture using [Optuna](https://optuna.org/).
 
 ```bash
 python hparam_search.py                          # defaults from config.yaml
@@ -126,7 +126,7 @@ hparam_search:
       choices: [resnet18, efficientnet_b0, convnext_tiny]
 ```
 
-Each trial is logged to TensorBoard under `logs/optuna/trial_N/`. The study uses `MedianPruner` to stop unpromising trials after a warmup period, optimizing `valid/f1_macro`.
+Each trial is logged to TensorBoard under `logs/optuna/trial_N/`.
 
 Results are persisted to `optuna.db` in the project root. To monitor trials live with the Optuna Dashboard (run in a separate terminal while the search is running):
 

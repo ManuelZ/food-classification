@@ -18,7 +18,6 @@ import torch
 import yaml
 from lightning.pytorch.loggers import TensorBoardLogger
 from optuna.artifacts import FileSystemArtifactStore, upload_artifact
-from optuna_integration import PyTorchLightningPruningCallback
 
 # Local imports
 from datamodule import KenyaDataModule
@@ -95,12 +94,11 @@ def objective(
         name=run_name,
         version=f"trial_{trial.number}",
     )
-    pruning_callback = PyTorchLightningPruningCallback(trial, monitor="valid/f1_macro")
 
     trainer = pl.Trainer(
         max_epochs=max_epochs,
         precision=_config["trainer"]["precision"],
-        callbacks=[pruning_callback],
+        callbacks=[],
         logger=logger,
         enable_progress_bar=True,
         enable_model_summary=False,
@@ -142,10 +140,8 @@ def main():
 
     artifact_store = FileSystemArtifactStore(base_path=_HPARAM["artifacts_dir"])
 
-    pruner = optuna.pruners.MedianPruner(**_HPARAM["pruner"])
     study = optuna.create_study(
         direction="maximize",
-        pruner=pruner,
         study_name="food-classification-hpo",
         storage=storage,
         load_if_exists=load_if_exists,

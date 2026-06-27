@@ -28,7 +28,7 @@ This project benchmarks 12 pretrained CNN backbones on a Kenyan food dataset to 
 
 **Preprocessing:** Images are pre-resized to **256×256 pixels** (INTER_AREA, JPEG quality 95) before training. No further resize or crop is applied at runtime.
 
-**Train / validation split:** `StratifiedShuffleSplit` with `random_state=0`. The 25% validation fraction provides a stable optimization signal for Optuna's pruner across trials limited to 10 epochs each.
+**Train / validation split:** `StratifiedShuffleSplit` with `random_state=0`. 
 
 ## Method
 
@@ -96,7 +96,7 @@ All models use `weights="DEFAULT"` (best available torchvision weights). ImageNe
 
 ## Phase 1 — Architecture Search (Optuna)
 
-Hyperparameter search using [Optuna](https://optuna.org/) over 30 trials, 10 epochs each. Unpromising trials are pruned with `MedianPruner` (3 startup trials, 5 warmup steps), optimizing `valid/f1_macro`.
+Hyperparameter search using [Optuna](https://optuna.org/) over 30 trials, 10 epochs each, optimizing `valid/f1_macro`.
 
 **Search space:**
 
