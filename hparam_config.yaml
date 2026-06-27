@@ -1,6 +1,7 @@
 n_trials: 30
 max_epochs: 10
 logger_name: optuna
+artifacts_dir: artifacts
 pruner:
   n_startup_trials: 3
   n_warmup_steps: 5
