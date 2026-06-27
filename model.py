@@ -148,7 +148,9 @@ class ImageClassifier(pl.LightningModule):
         self.log("valid/f1_macro", self.valid_f1_macro, prog_bar=True, logger=False)
         self.log("step", self.current_epoch, logger=True)
 
-        fig, _ = self.confusion_matrix.plot(labels=self.label_names)
+        fig, ax = self.confusion_matrix.plot(labels=self.label_names)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+        fig.tight_layout()
         self.logger.experiment.add_figure(
             "valid/confusion_matrix", fig, self.current_epoch
         )
