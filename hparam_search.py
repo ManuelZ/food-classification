@@ -115,7 +115,7 @@ def main():
         type=str,
         default=None,
         help="SQLite DB path to resume a previous study (e.g. sqlite:///optuna_20260626_143022.db). "
-             "If omitted, a new timestamped DB is created.",
+        "If omitted, a new timestamped DB is created.",
     )
     args = parser.parse_args()
 
