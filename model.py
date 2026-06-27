@@ -150,7 +150,6 @@ class ImageClassifier(pl.LightningModule):
 
         fig, ax = self.confusion_matrix.plot(labels=self.label_names)
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
-        fig.tight_layout()
         self.logger.experiment.add_figure(
             "valid/confusion_matrix", fig, self.current_epoch
         )
