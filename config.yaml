@@ -36,6 +36,7 @@ model:
 trainer:
   max_epochs: 1
   precision: 16-mixed
+  deterministic: true
   fast_dev_run: false
   logger:
     class_path: lightning.pytorch.loggers.TensorBoardLogger
