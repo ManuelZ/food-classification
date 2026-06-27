@@ -1,7 +1,6 @@
 n_trials: 30
 max_epochs: 10
 logger_name: optuna
-early_stopping_patience: 5
 pruner:
   n_startup_trials: 3
   n_warmup_steps: 5

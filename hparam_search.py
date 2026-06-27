@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import optuna
 import torch
 import yaml
-from lightning.pytorch.callbacks import EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 from optuna.artifacts import FileSystemArtifactStore, upload_artifact
 from optuna_integration import PyTorchLightningPruningCallback
@@ -95,16 +94,11 @@ def objective(
         save_dir="logs", name=run_name, version=f"trial_{trial.number}"
     )
     pruning_callback = PyTorchLightningPruningCallback(trial, monitor="valid/f1_macro")
-    early_stop_callback = EarlyStopping(
-        monitor="valid/f1_macro",
-        patience=_HPARAM["early_stopping_patience"],
-        mode="max",
-    )
 
     trainer = pl.Trainer(
         max_epochs=max_epochs,
         precision=_config["trainer"]["precision"],
-        callbacks=[pruning_callback, early_stop_callback],
+        callbacks=[pruning_callback],
         logger=logger,
         enable_progress_bar=True,
         enable_model_summary=False,
