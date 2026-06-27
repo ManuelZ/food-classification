@@ -1,8 +1,6 @@
 # See other possible options with:
 # python main.py fit --print_config
 
-seed_everything: 21
-
 model:
   model_name: resnet50
   weights: DEFAULT
