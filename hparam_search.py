@@ -1,10 +1,12 @@
 # Usage:
 #   python hparam_search.py
 #   python hparam_search.py --n-trials 30 --max-epochs 5
+#   python hparam_search.py --storage sqlite:///optuna_20260626_143022.db  # resume a previous study
 
 # Standard Library imports
 import argparse
 import functools
+from datetime import datetime
 
 # External imports
 import lightning as pl
@@ -106,15 +108,26 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--n-trials", type=int, default=_HPARAM["n_trials"])
     parser.add_argument("--max-epochs", type=int, default=_HPARAM["max_epochs"])
+    parser.add_argument(
+        "--storage",
+        type=str,
+        default=None,
+        help="SQLite DB path to resume a previous study (e.g. sqlite:///optuna_20260626_143022.db). "
+             "If omitted, a new timestamped DB is created.",
+    )
     args = parser.parse_args()
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    storage = args.storage or f"sqlite:///optuna_{timestamp}.db"
+    load_if_exists = args.storage is not None
 
     pruner = optuna.pruners.MedianPruner(**_HPARAM["pruner"])
     study = optuna.create_study(
         direction="maximize",
         pruner=pruner,
         study_name="food-classification-hpo",
-        storage="sqlite:///optuna.db",
-        load_if_exists=True,
+        storage=storage,
+        load_if_exists=load_if_exists,
     )
     study.optimize(
         lambda trial: objective(trial, args.max_epochs),
