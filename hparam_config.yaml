@@ -16,8 +16,10 @@ search_space:
     high: 1.0e-2
     log: true
   batch_size:
-    type: categorical
-    choices: [64, 128, 256, 384]
+    type: int
+    low: 32
+    high: 384
+    log: False
   model_name:
     type: categorical
     choices:
