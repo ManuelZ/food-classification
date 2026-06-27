@@ -1,7 +1,7 @@
 from pathlib import Path
+from typing import Optional
 
 import albumentations as A
-import cv2
 import lightning as pl
 import pandas as pd
 import torch
@@ -11,6 +11,18 @@ from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import DataLoader
 
 from dataset import KenyanFood13Dataset
+
+
+def build_transforms(aug_configs: list) -> A.Compose:
+    transforms = []
+    for cfg in aug_configs:
+        cfg = cfg.copy()
+        name = cfg.pop("name")
+        if name == "ToTensorV2":
+            transforms.append(ToTensorV2(**cfg))
+        else:
+            transforms.append(getattr(A, name)(**cfg))
+    return A.Compose(transforms)
 
 
 def denormalize(tensors):
@@ -39,6 +51,8 @@ class KenyaDataModule(pl.LightningDataModule):
         prefetch_factor: int = 2,
         target_size: int = 256,
         train_split: float = 0.75,
+        train_augmentations: Optional[list] = None,
+        eval_augmentations: Optional[list] = None,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -50,40 +64,21 @@ class KenyaDataModule(pl.LightningDataModule):
         self.target_size = target_size
         self.train_split = train_split
 
-        self.common_transforms = A.Compose([A.Normalize(), ToTensorV2()])
-
-        self.train_transforms = A.Compose(
-            [
-                A.HorizontalFlip(),
-                A.VerticalFlip(),
-                A.RandomRotate90(),
-                A.ColorJitter(
-                    brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2, p=0.8
-                ),
-                A.ToGray(p=0.1),
-                A.GaussianBlur(blur_limit=(3, 7), p=0.2),
-                A.GaussNoise(p=0.2),
-                A.Sharpen(alpha=(0.2, 0.5), lightness=(0.5, 1.0), p=0.3),
-                A.Affine(
-                    translate_percent=0.1,
-                    rotate=(-45, 45),
-                    border_mode=cv2.BORDER_CONSTANT,
-                    fill=0,
-                    p=0.5,
-                ),
-                A.CoarseDropout(
-                    num_holes_range=(1, 8),
-                    hole_height_range=(16, 32),
-                    hole_width_range=(16, 32),
-                    p=0.3,
-                ),
-                A.Normalize(),
-                ToTensorV2(),
-            ]
+        self.train_transforms = (
+            build_transforms(train_augmentations)
+            if train_augmentations is not None
+            else None
         )
-
-        self.valid_transforms = A.Compose([self.common_transforms])
-        self.test_transforms = A.Compose([self.common_transforms])
+        self.valid_transforms = (
+            build_transforms(eval_augmentations)
+            if eval_augmentations is not None
+            else None
+        )
+        self.test_transforms = (
+            build_transforms(eval_augmentations)
+            if eval_augmentations is not None
+            else None
+        )
 
     def prepare_data(self):
         """

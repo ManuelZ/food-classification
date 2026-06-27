@@ -65,5 +65,42 @@ data:
   num_workers: 0
   target_size: 256
   train_split: 0.75
+  train_augmentations:
+    - name: HorizontalFlip
+    - name: VerticalFlip
+    - name: RandomRotate90
+    - name: ColorJitter
+      brightness: 0.4
+      contrast: 0.4
+      saturation: 0.4
+      hue: 0.2
+      p: 0.8
+    - name: ToGray
+      p: 0.1
+    - name: GaussianBlur
+      blur_limit: [3, 7]
+      p: 0.2
+    - name: GaussNoise
+      p: 0.2
+    - name: Sharpen
+      alpha: [0.2, 0.5]
+      lightness: [0.5, 1.0]
+      p: 0.3
+    - name: Affine
+      translate_percent: 0.1
+      rotate: [-45, 45]
+      border_mode: 0  # cv2.BORDER_CONSTANT
+      fill: 0
+      p: 0.5
+    - name: CoarseDropout
+      num_holes_range: [1, 8]
+      hole_height_range: [16, 32]
+      hole_width_range: [16, 32]
+      p: 0.3
+    - name: Normalize
+    - name: ToTensorV2
+  eval_augmentations:
+    - name: Normalize
+    - name: ToTensorV2
 ckpt_path: null
 weights_only: null
