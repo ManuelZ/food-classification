@@ -3,29 +3,6 @@
 
 seed_everything: 21
 
-trainer:
-  max_epochs: 1
-  precision: 16-mixed
-  fast_dev_run: false
-  logger:
-    class_path: lightning.pytorch.loggers.TensorBoardLogger
-    init_args:
-      save_dir: logs
-      name: resnet50
-  callbacks:
-    - class_path: lightning.pytorch.callbacks.EarlyStopping
-      init_args:
-        monitor: valid/loss
-        min_delta: 0.001
-        patience: 10
-    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
-      init_args:
-        monitor: valid/f1_macro
-        mode: max
-        filename: fine-tuning-resnet50-epoch-{epoch:02d}
-        auto_insert_metric_name: false
-        save_weights_only: true
-
 model:
   model_name: resnet50
   weights: DEFAULT
@@ -43,6 +20,29 @@ model:
     class_path: torch.optim.lr_scheduler.CosineAnnealingLR
     init_args:
       T_max: 100
+
+trainer:
+  max_epochs: 1
+  precision: 16-mixed
+  fast_dev_run: false
+  logger:
+    class_path: lightning.pytorch.loggers.TensorBoardLogger
+    init_args:
+      save_dir: logs
+      name: ${model.model_name}
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.EarlyStopping
+      init_args:
+        monitor: valid/loss
+        min_delta: 0.001
+        patience: 10
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        monitor: valid/f1_macro
+        mode: max
+        filename: ${model.model_name}-epoch-{epoch:02d}
+        auto_insert_metric_name: false
+        save_weights_only: true
 
 data:
   root_folder: /workspace/opencv-pytorch-classification-project-2-resize
@@ -100,3 +100,4 @@ data:
     - name: ToTensorV2
 ckpt_path: null
 weights_only: null
+seed_everything: 21

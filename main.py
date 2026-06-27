@@ -12,7 +12,12 @@ from model import ImageClassifier
 
 
 def cli_main():
-    LightningCLI(ImageClassifier, KenyaDataModule, auto_configure_optimizers=False)
+    LightningCLI(
+        ImageClassifier,
+        KenyaDataModule,
+        auto_configure_optimizers=False,
+        parser_kwargs={"parser_mode": "omegaconf"},
+    )
 
 
 if __name__ == "__main__":
