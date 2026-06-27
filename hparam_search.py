@@ -91,7 +91,9 @@ def objective(
     )
 
     logger = TensorBoardLogger(
-        save_dir="logs", name=run_name, version=f"trial_{trial.number}"
+        save_dir=_config["trainer"]["logger"]["init_args"]["save_dir"],
+        name=run_name,
+        version=f"trial_{trial.number}",
     )
     pruning_callback = PyTorchLightningPruningCallback(trial, monitor="valid/f1_macro")
 
@@ -138,7 +140,7 @@ def main():
     storage = args.storage or f"sqlite:///optuna_{timestamp}.db"
     load_if_exists = args.storage is not None
 
-    artifact_store = FileSystemArtifactStore(base_path="artifacts")
+    artifact_store = FileSystemArtifactStore(base_path=_HPARAM["artifacts_dir"])
 
     pruner = optuna.pruners.MedianPruner(**_HPARAM["pruner"])
     study = optuna.create_study(
