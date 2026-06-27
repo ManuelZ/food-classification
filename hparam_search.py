@@ -50,7 +50,7 @@ def _suggest(trial: optuna.Trial, search_space: dict) -> dict:
     return params
 
 
-def objective(trial: optuna.Trial, max_epochs: int) -> float:
+def objective(trial: optuna.Trial, max_epochs: int, run_name: str) -> float:
     params = _suggest(trial, _HPARAM["search_space"])
     lr = params["lr"]
     weight_decay = params["weight_decay"]
@@ -83,11 +83,13 @@ def objective(trial: optuna.Trial, max_epochs: int) -> float:
     )
 
     logger = TensorBoardLogger(
-        save_dir="logs", name="optuna", version=f"trial_{trial.number}"
+        save_dir="logs", name=run_name, version=f"trial_{trial.number}"
     )
     pruning_callback = PyTorchLightningPruningCallback(trial, monitor="valid/f1_macro")
     early_stop_callback = EarlyStopping(
-        monitor="valid/f1_macro", patience=3, mode="max"
+        monitor="valid/f1_macro",
+        patience=_HPARAM["early_stopping_patience"],
+        mode="max",
     )
 
     trainer = pl.Trainer(
@@ -130,7 +132,9 @@ def main():
         load_if_exists=load_if_exists,
     )
     study.optimize(
-        lambda trial: objective(trial, args.max_epochs),
+        lambda trial: objective(
+            trial, args.max_epochs, f"{_HPARAM['logger_name']}_{timestamp}"
+        ),
         n_trials=args.n_trials,
         gc_after_trial=True,
     )
